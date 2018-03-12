@@ -67,7 +67,7 @@ def py3_image(name, base=None, deps=[], layers=[], entrypoint='', **kwargs):
     **kwargs: See py_binary.
   """
   if not entrypoint:
-    entrypoint = ['/usr/local/bin/python']
+    entrypoint = ['/usr/local/bin/python3.6']
 
   binary_name = name + ".binary"
 
