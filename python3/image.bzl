@@ -43,13 +43,14 @@ def repositories():
       repository = "library/python",
       digest = DIGESTS["latest"],
     )
-  if "py3_debug_image_base" not in excludes:
-    container_pull(
-      name = "py3_debug_image_base",
-      registry = "gcr.io",
-      repository = "distroless/python3",
-      digest = DIGESTS["debug"],
-    )
+
+#  if "py3_debug_image_base" not in excludes:
+#    container_pull(
+#      name = "py3_debug_image_base",
+#      registry = "gcr.io",
+#      repository = "distroless/python3",
+#      digest = DIGESTS["debug"],
+#    )
 
 DEFAULT_BASE = select({
     "@io_bazel_rules_docker//:fastbuild": "@py3_image_base//image",
@@ -73,7 +74,8 @@ def py3_image(name, base=None, deps=[], layers=[], entrypoint=["/usr/local/bin/p
 
   # TODO(mattmoor): Consider using par_binary instead, so that
   # a single target can be used for all three.
-  native.py_binary(name=binary_name, deps=deps + layers, **kwargs)
+  native.py_binary(name=binary_name, deps=deps + layers,
+                   default_python_version="PY3", **kwargs)
 
   # TODO(mattmoor): Consider making the directory into which the app
   # is placed configurable.
@@ -85,6 +87,8 @@ def py3_image(name, base=None, deps=[], layers=[], entrypoint=["/usr/local/bin/p
 
   visibility = kwargs.get('visibility', None)
   tags = kwargs.get('tags', None)
-  app_layer(name=name, base=base, entrypoint=entrypoint,
+  # unset the cmd attribute, since the entrypoint defines the python binary we run
+  empty_cmd = ['--']
+  app_layer(name=name, base=base, entrypoint=entrypoint, cmd=empty_cmd,
             binary=binary_name, lang_layers=layers, visibility=visibility,
             tags=tags)

@@ -207,7 +207,6 @@ def _app_layer_impl(ctx, runfiles=None, emptyfiles=None):
     # root, since they may be accessed via either path.
     _external_dir(ctx): _runfiles_dir(ctx),
   })
-
   return _container.image.implementation(
     ctx,
     # We use all absolute paths.
@@ -217,7 +216,8 @@ def _app_layer_impl(ctx, runfiles=None, emptyfiles=None):
     # image is `docker run ...`.
     # Per: https://docs.docker.com/engine/reference/builder/#entrypoint
     # we should use the "exec" (list) form of entrypoint.
-    entrypoint=ctx.attr.entrypoint + [_binary_name(ctx)])
+    entrypoint=ctx.attr.entrypoint + [_binary_name(ctx)],
+    cmd=ctx.attr.cmd)
 
 app_layer = rule(
     attrs = dict(_container.image.attrs.items() + {
@@ -233,7 +233,7 @@ app_layer = rule(
         # The base image on which to overlay the dependency layers.
         "base": attr.label(mandatory = True),
         "entrypoint": attr.string_list(default = []),
-
+        "cmd": attr.string_list(default=[]),
         # Whether each dependency is laid out in a manner that is agnostic
         # of the binary in which it is participating.  This can increase
         # sharing of the dependency's layer across images, but requires a
