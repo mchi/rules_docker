@@ -39,8 +39,8 @@ def repositories():
   if "py3_image_base" not in excludes:
     container_pull(
       name = "py3_image_base",
-      registry = "gcr.io",
-      repository = "distroless/python3",
+      registry = "index.docker.io",
+      repository = "library/python",
       digest = DIGESTS["latest"],
     )
   if "py3_debug_image_base" not in excludes:
@@ -58,7 +58,7 @@ DEFAULT_BASE = select({
     "//conditions:default": "@py3_image_base//image",
 })
 
-def py3_image(name, base=None, deps=[], layers=[], entrypoint='', **kwargs):
+def py3_image(name, base=None, deps=[], layers=[], **kwargs):
   """Constructs a container image wrapping a py_binary target.
 
   Args:
@@ -66,9 +66,6 @@ def py3_image(name, base=None, deps=[], layers=[], entrypoint='', **kwargs):
            their own layers.
     **kwargs: See py_binary.
   """
-  if not entrypoint:
-    entrypoint = ['/usr/local/bin/python3.6']
-
   binary_name = name + ".binary"
 
   if "main" not in kwargs:
